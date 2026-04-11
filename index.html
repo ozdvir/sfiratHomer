@@ -3,140 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <title>ספירת העומר - אביב רענן</title>
+
     <style>
-       body { 
-            
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            /* שימוש בתמונת דשא רענן ושמש בקישור ישיר */
-            background: url('https://magazine.isees.org.il/wp-content/uploads/2023/07/EE-summer23-agricultural-drought-4-rotated-e1688983335106.jpg') 
-            no-repeat center center fixed;
-            background-size: cover;            background-size: cover;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
-        
-        /* שכבת טשטוש עדינה על כל הרקע כדי להבליט את הכרטיס */
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: url('https://magazine.isees.org.il/wp-content/uploads/2023/07/EE-summer23-agricultural-drought-4-rotated-e1688983335106.jpg')
+            no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .overlay {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(3px);
             z-index: 1;
         }
 
-        .card { 
+        .container {
             position: relative;
             z-index: 2;
-            background: rgba(255, 255, 255, 0.85); 
+            width: 1920px;
+            height: 1080px;
+            max-width: 100%;
+            max-height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* כרטיס ספירת העומר */
+        .omer-card {
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(15px);
-            padding: 40px; 
-            border-radius: 40px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
-            text-align: center; 
-            width: 400px; 
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            animation: fadeIn 1s ease-in-out;
+            padding: 15px;
+            border-radius: 20px;
+            width: 750px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: scale(0.85);
         }
 
-        .hebrew-date { font-size: 1.8em; color: #2d5a27; font-weight: bold; margin-bottom: 5px; }
-        .gregorian-date { color: #666; font-size: 0.9em; margin-bottom: 25px; letter-spacing: 1px; }
+        .hebrew-date { font-size: 1.8em; color: #2d5a27; font-weight: bold; }
+        .gregorian-date { font-size: 1em; color: #444; margin-bottom: 10px; }
+        .omer-count { font-size: 3.2em; font-weight: 900; color: #2d5a27; }
+        .weeks-detail { font-size: 1.2em; color: #2d5a27; }
 
-        .omer-box { 
-            background: linear-gradient(135deg, #74b816, #5c940d); /* ירוק אביבי רענן */
-            color: white;
-            border-radius: 25px; 
-            padding: 30px; 
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(92, 148, 13, 0.3);
+        /* כותרת */
+        .video-title {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #2d5a27;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .omer-label { font-size: 1.1em; opacity: 0.9; display: block; margin-bottom: 8px; }
-        .omer-count { font-size: 4.8em; font-weight: 900; line-height: 0.9; display: block; }
-        .omer-text { font-size: 1.4em; font-weight: bold; display: block; margin-top: 10px; }
-
-        .weeks-detail { 
-            font-size: 1.25em; 
-            color: #2d5a27; 
-            font-weight: 600;
-            padding-top: 10px;
-            border-top: 1px dashed rgba(0,0,0,0.1);
+        /* וידאו ברוחב זהה לכרטיס */
+        .youtube-wrapper {
+            position: relative;
+            width: 750px;
+            height: 420px; /* יחס 16:9 מוקטן */
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        .youtube-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
+
 <body>
 
 <div class="overlay"></div>
 
-<div class="card">
-    <div id="hebrew-date" class="hebrew-date">טוען תאריך...</div>
-    <div id="gregorian-date" class="gregorian-date"></div>
-    
-    <div class="omer-box">
-        <span class="omer-label">היום בספירת העומר</span>
-        <span id="omer-num" class="omer-count">--</span>
-        <span id="omer-text" class="omer-text">ימים לעומר</span>
+<div class="container">
+
+    <!-- כרטיס ספירת העומר -->
+    <div class="omer-card">
+        <div id="hebrew-date" class="hebrew-date">ספירת העומר</div>
+        <div id="gregorian-date" class="gregorian-date"></div>
+        <div id="omer-num" class="omer-count">--</div>
+        <div id="omer-details" class="weeks-detail"></div>
     </div>
 
-    <div id="omer-details" class="weeks-detail"></div>
+    <!-- כותרת -->
+    <div class="video-title">כוחו של יהודי בספירת העומר</div>
+
+    <!-- וידאו ברוחב זהה -->
+    <div class="youtube-wrapper">
+    <iframe
+        src="https://www.youtube.com/embed/V6X6vsdaltE?autoplay=1&mute=1&loop=1&playlist=V6X6vsdaltE&controls=0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+    </iframe>
+    </div>
+
 </div>
 
 <script>
-    // פונקציית גימטריה משופרת
     function getGematria(num) {
         const letters = ["", "א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ז'", "ח'", "ט'", "י'", "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'", "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"];
         return letters[num] || num;
     }
 
-    function updateOmerPage() {
+    async function updateOmerFromApi() {
         const now = new Date();
-        
-        // הגדרת תאריך עברי להיום (6 באפריל 2026 - י"ט בניסן)
-        const dayInMonth = 19; 
-        const monthName = "ניסן";
-        const yearHebrew = "תשפ\"ו";
-        
-        document.getElementById('hebrew-date').innerText = `${getGematria(dayInMonth)} ב${monthName} ${yearHebrew}`;
-        document.getElementById('gregorian-date').innerText = now.toLocaleDateString('he-IL');
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        // חישוב ימי העומר (תחילת ספירה: 2 באפריל בערב)
-        const startOmer = new Date("2026-04-02T19:00:00");
-        const diffInMs = now - startOmer;
-        const currentDay = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&start=${todayStr}&end=${todayStr}&o=on&i=on&hebdate=on`;
 
-        if (currentDay > 0 && currentDay <= 49) {
-            document.getElementById('omer-num').innerText = currentDay;
-            
-            const weeks = Math.floor(currentDay / 7);
-            const days = currentDay % 7;
-            
-            let detail = "";
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            document.getElementById('gregorian-date').innerText =
+                now.toLocaleDateString('he-IL');
+
+            if (data.hebrew) {
+                document.getElementById('hebrew-date').innerText = data.hebrew;
+            }
+
+            const omerItem = data.items && data.items.find(e =>
+                e.category === 'omer' ||
+                (e.title && e.title.toLowerCase().includes('omer'))
+            );
+
+            if (!omerItem) return;
+
+            const match = omerItem.title.match(/(\d+)[a-z]{2}\s+day/i);
+            let dayNum = match ? parseInt(match[1], 10) : null;
+
+            if (!dayNum) return;
+
+            if (now.getHours() >= 19) {
+                dayNum += 1;
+            }
+
+            document.getElementById('omer-num').innerText = dayNum;
+
+            const weeks = Math.floor(dayNum / 7);
+            const days = dayNum % 7;
+
+            let detail = '';
             if (weeks > 0) {
-                const weekText = weeks === 1 ? "שבוע אחד" : `${getGematria(weeks).replace("'", "")} שבועות`;
+                const weekText = weeks === 1
+                    ? 'שבוע אחד'
+                    : `${getGematria(weeks).replace("'", "")} שבועות`;
                 detail = `שהם ${weekText}`;
                 if (days > 0) {
-                    const dayText = days === 1 ? "יום אחד" : `${getGematria(days)} ימים`;
+                    const dayText = days === 1
+                        ? 'יום אחד'
+                        : `${getGematria(days)} ימים`;
                     detail += ` ו-${dayText}`;
                 }
             } else {
-                detail = "שבוע ראשון לספירה";
+                detail = 'שבוע ראשון לספירה';
             }
+
             document.getElementById('omer-details').innerText = detail;
-        } else {
-            document.getElementById('omer-num').innerText = "0";
-            document.getElementById('omer-text').innerText = "מחוץ לימי הספירה";
+
+        } catch (err) {
+            console.error('שגיאה בשליפת נתוני ספירת העומר:', err);
         }
     }
 
-    updateOmerPage();
+    updateOmerFromApi();
+
+    setInterval(() => {
+    location.reload();
+}, 3600000); // 1 שעה = 3,600,000 מילישניות
+
 </script>
 
 </body>
