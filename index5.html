@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>שבת מיוחדת בבית הכנסת</title>
+  <title>שבת מברכים</title>
 
   <style>
     body {
@@ -24,11 +24,12 @@
       justify-content: flex-start;
       align-items: center;
 
-      padding-top: 120px;
+      padding-top: 110px;
       box-sizing: border-box;
       position: relative;
     }
 
+    /* שעון */
     #clock {
       position: absolute;
       top: 20px;
@@ -37,6 +38,7 @@
       font-weight: 600;
     }
 
+    /* מסגרת זהב */
     .special-box {
       border: 4px solid #d4af37;
       padding: 40px 80px;
@@ -49,8 +51,15 @@
     h1 {
       font-size: 90px;
       font-weight: 900;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: #ffd86b;
+    }
+
+    .month {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 25px;
+      color: #ffffff;
     }
 
     .times {
@@ -71,13 +80,18 @@
     <div id="clock">00:00:00</div>
 
     <div class="special-box">
-      <h1>שבת מיוחדת</h1>
+
+      <h1>שבת מברכים</h1>
+
+      <!-- כאן אתה מעדכן את שם החודש -->
+      <div class="month">מברכים את חודש אייר</div>
 
       <div class="times">
         <div><span class="label">שחרית:</span> 9:00</div>
         <div><span class="label">מנחה:</span> 18:50</div>
         <div><span class="label">ערבית וצאת שבת:</span> 19:56</div>
       </div>
+
     </div>
 
     <script>
