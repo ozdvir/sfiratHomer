@@ -6,58 +6,70 @@
 
   <style>
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0;          /* ← אין שוליים */
+      padding: 0;         /* ← אין רווחים */
+      overflow: hidden;   /* ← שלא יופיע גלילה */
+      width: 100vw;
+      height: 100vh;
+
       font-family: "Heebo", Arial, sans-serif;
 
       background-image: url("https://raw.githubusercontent.com/ozdvir/sfiratHomer/main/%D7%A9%D7%91%D7%AA%20%D7%A9%D7%9C%D7%95%D7%9D.webp");
       background-size: cover;
       background-position: center;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
 
       color: #ffffff;
-      text-shadow: 0 0 10px black;
+      text-shadow: 0 0 12px black;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-
-      padding: 40px 70px;
-      box-sizing: border-box;
       position: relative;
     }
 
-    /* שעון */
-    #clock {
+    /* -----------------------------
+       מיקום וגודל השעון והתאריך
+       ----------------------------- */
+    #top-info {
       position: absolute;
-      top: 20px;
-      right: 40px;
-      font-size: 48px;
+      top: 20px;     /* ← להזיז למעלה/למטה */
+      right: 40px;   /* ← להזיז ימינה/שמאלה */
+      text-align: right;
+    }
+
+    #clock {
+      font-size: 48px;   /* ← גודל השעון */
       font-weight: 600;
-      text-shadow: 0 0 12px black;
     }
 
+    #hebrew-date {
+      font-size: 32px;   /* ← גודל התאריך */
+      margin-top: 5px;
+      font-weight: 500;
+      color: #ffd86b;
+    }
+
+    /* -----------------------------
+       מיקום וגודל הכותרת
+       ----------------------------- */
     h1 {
-      font-size: 80px;
+      position: absolute;
+      top: 180px;     /* ← להזיז למעלה/למטה */
+      left: 70px;     /* ← להזיז ימינה/שמאלה */
+      font-size: 80px; /* ← גודל הכותרת */
       font-weight: 800;
-      margin: 140px 0 10px 0; /* הועלה למעלה */
-      text-align: left;
-      width: 100%;
+      margin: 0;
     }
 
+    /* -----------------------------
+       מיקום וגודל זמני התפילה
+       ----------------------------- */
     .times {
-      font-size: 38px;
+      position: absolute;
+      top: 300px;        /* ← להזיז למעלה/למטה */
+      left: 50%;         /* מרכז */
+      transform: translateX(-50%) translateX(-100px); /* ← הזזה שמאלה/ימינה */
+      font-size: 38px;   /* ← גודל הזמנים */
       line-height: 1.7;
       font-weight: 300;
-
-      width: 100%;
       text-align: center;
-      margin-top: 0;
-
-      transform: translateX(-100px);
     }
 
     .label {
@@ -69,10 +81,16 @@
 
 <body>
 
-    <div id="clock">00:00:00</div>
+    <!-- שעון + תאריך עברי -->
+    <div id="top-info">
+      <div id="clock">00:00:00</div>
+      <div id="hebrew-date">טוען תאריך עברי...</div>
+    </div>
 
+    <!-- כותרת -->
     <h1>פרשת השבוע אחרי מות - קדושים</h1>
 
+    <!-- זמני תפילה -->
     <div class="times">
       <div><span class="label">שחרית:</span> 9:00</div>
       <div><span class="label">מנחה:</span> 18:50</div>
@@ -80,6 +98,7 @@
     </div>
 
     <script>
+      /* שעון חי */
       function updateClock() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
@@ -89,6 +108,84 @@
       }
       setInterval(updateClock, 1000);
       updateClock();
+
+
+      /* המרת מספר (1–30) ליום בחודש באותיות */
+      function dayNumberToHebrew(num) {
+        const letters = {
+          1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
+          10:"י",20:"כ",30:"ל"
+        };
+
+        if (num === 15) return "ט״ו";
+        if (num === 16) return "ט״ז";
+
+        let result = "";
+        let n = num;
+
+        const values = [30,20,10,9,8,7,6,5,4,3,2,1];
+
+        for (let v of values) {
+          while (n >= v) {
+            result += letters[v];
+            n -= v;
+          }
+        }
+
+        if (result.length === 1) return result + "׳";
+        return result[0] + "״" + result.slice(1);
+      }
+
+
+      /* המרת שנה עברית (5786 → תשפ"ו) */
+      function yearNumberToHebrew(yearNum) {
+        const letters = {
+          1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
+          10:"י",20:"כ",30:"ל",40:"מ",50:"נ",60:"ס",70:"ע",80:"פ",90:"צ",
+          100:"ק",200:"ר",300:"ש",400:"ת"
+        };
+
+        let n = yearNum % 1000;
+
+        let result = "";
+        const values = [400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1];
+
+        for (let v of values) {
+          while (n >= v) {
+            result += letters[v];
+            n -= v;
+          }
+        }
+
+        if (result.length === 1) {
+          return result + "׳";
+        } else {
+          const last = result.slice(-1);
+          const rest = result.slice(0, -1);
+          return rest + "״" + last;
+        }
+      }
+
+
+      /* תאריך עברי אוטומטי */
+      function getHebrewDate() {
+        const now = new Date();
+        const options = { calendar: "hebrew", day: "numeric", month: "long", year: "numeric" };
+        const hebrew = now.toLocaleDateString("he-IL-u-ca-hebrew", options);
+
+        const parts = hebrew.split(" ");
+        const day = parseInt(parts[0]);
+        const month = parts[1];
+        const year = parseInt(parts[2]);
+
+        const dayHeb = dayNumberToHebrew(day);
+        const yearHeb = yearNumberToHebrew(year);
+
+        document.getElementById("hebrew-date").textContent =
+          `${dayHeb} ${month} ${yearHeb}`;
+      }
+
+      getHebrewDate();
     </script>
 
 </body>
