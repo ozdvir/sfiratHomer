@@ -29,16 +29,25 @@
       position: relative;
     }
 
-    /* שעון */
-    #clock {
+    #top-info {
       position: absolute;
       top: 20px;
       right: 40px;
+      text-align: right;
+    }
+
+    #clock {
       font-size: 48px;
       font-weight: 600;
     }
 
-    /* מסגרת זהב */
+    #hebrew-date {
+      font-size: 32px;
+      margin-top: 5px;
+      font-weight: 500;
+      color: #ffd86b;
+    }
+
     .special-box {
       border: 4px solid #d4af37;
       padding: 40px 80px;
@@ -77,13 +86,16 @@
 
 <body>
 
-    <div id="clock">00:00:00</div>
+    <div id="top-info">
+      <div id="clock">00:00:00</div>
+      <div id="hebrew-date">טוען תאריך עברי...</div>
+    </div>
 
     <div class="special-box">
 
       <h1>שבת מברכים</h1>
 
-      <!-- כאן אתה מעדכן את שם החודש -->
+      <!-- עדכון שם החודש -->
       <div class="month">מברכים את חודש אייר</div>
 
       <div class="times">
@@ -95,6 +107,7 @@
     </div>
 
     <script>
+      /* שעון חי */
       function updateClock() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
@@ -104,6 +117,86 @@
       }
       setInterval(updateClock, 1000);
       updateClock();
+
+
+      /* המרת מספר (1–30) ליום בחודש באותיות */
+      function dayNumberToHebrew(num) {
+        const letters = {
+          1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
+          10:"י",20:"כ",30:"ל"
+        };
+
+        if (num === 15) return "ט״ו";
+        if (num === 16) return "ט״ז";
+
+        let result = "";
+        let n = num;
+
+        const values = [30,20,10,9,8,7,6,5,4,3,2,1];
+
+        for (let v of values) {
+          while (n >= v) {
+            result += letters[v];
+            n -= v;
+          }
+        }
+
+        if (result.length === 1) return result + "׳";
+        return result[0] + "״" + result.slice(1);
+      }
+
+
+      /* המרת שנה עברית (למשל 5786 → תשפ"ו) */
+      function yearNumberToHebrew(yearNum) {
+        const letters = {
+          1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
+          10:"י",20:"כ",30:"ל",40:"מ",50:"נ",60:"ס",70:"ע",80:"פ",90:"צ",
+          100:"ק",200:"ר",300:"ש",400:"ת"
+        };
+
+        // לוקחים רק את שלושת הספרות האחרונות (5786 → 786)
+        let n = yearNum % 1000;
+
+        let result = "";
+        const values = [400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1];
+
+        for (let v of values) {
+          while (n >= v) {
+            result += letters[v];
+            n -= v;
+          }
+        }
+
+        // גרשיים לפני האות האחרונה
+        if (result.length === 1) {
+          return result + "׳";
+        } else {
+          const last = result.slice(-1);
+          const rest = result.slice(0, -1);
+          return rest + "״" + last;
+        }
+      }
+
+
+      /* תאריך עברי אוטומטי */
+      function getHebrewDate() {
+        const now = new Date();
+        const options = { calendar: "hebrew", day: "numeric", month: "long", year: "numeric" };
+        const hebrew = now.toLocaleDateString("he-IL-u-ca-hebrew", options);
+
+        const parts = hebrew.split(" ");
+        const day = parseInt(parts[0]);
+        const month = parts[1];
+        const year = parseInt(parts[2]);
+
+        const dayHeb = dayNumberToHebrew(day);
+        const yearHeb = yearNumberToHebrew(year);
+
+        document.getElementById("hebrew-date").textContent =
+          `${dayHeb} ${month} ${yearHeb}`;
+      }
+
+      getHebrewDate();
     </script>
 
 </body>
