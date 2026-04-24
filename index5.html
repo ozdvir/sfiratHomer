@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>שבת מיוחדת בבית הכנסת</title>
 
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Heebo", Arial, sans-serif;
+
+      background-image: url("https://raw.githubusercontent.com/ozdvir/sfiratHomer/main/%D7%A9%D7%91%D7%AA%20%D7%A9%D7%9C%D7%95%D7%9D.webp");
+      background-size: cover;
+      background-position: center;
+      width: 100vw;
+      height: 100vh;
+
+      color: #ffffff;
+      text-shadow: 0 0 12px black;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+
+      padding-top: 120px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    #clock {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      font-size: 48px;
+      font-weight: 600;
+    }
+
+    .special-box {
+      border: 4px solid #d4af37;
+      padding: 40px 80px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 90px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: #ffd86b;
+    }
+
+    .times {
+      font-size: 40px;
+      line-height: 1.8;
+      font-weight: 300;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #ffd86b;
+    }
+  </style>
+</head>
+
+<body>
+
+    <div id="clock">00:00:00</div>
+
+    <div class="special-box">
+      <h1>שבת מיוחדת</h1>
+
+      <div class="times">
+        <div><span class="label">שחרית:</span> 9:00</div>
+        <div><span class="label">מנחה:</span> 18:50</div>
+        <div><span class="label">ערבית וצאת שבת:</span> 19:56</div>
+      </div>
+    </div>
+
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById("clock").textContent = `${h}:${m}:${s}`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+    </script>
+
+</body>
+</html>
