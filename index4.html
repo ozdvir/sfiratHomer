@@ -10,9 +10,7 @@
       padding: 0;
       font-family: "Heebo", Arial, sans-serif;
 
-      /* רקע מהתמונה שלך ב‑GitHub (קישור RAW) */
       background-image: url("https://raw.githubusercontent.com/ozdvir/sfiratHomer/main/%D7%A9%D7%91%D7%AA%20%D7%A9%D7%9C%D7%95%D7%9D.webp");
-
       background-size: cover;
       background-position: center;
       width: 100vw;
@@ -27,26 +25,25 @@
       justify-content: flex-start;
       align-items: flex-start;
 
-      padding: 50px 70px;
+      padding: 40px 70px;
       box-sizing: border-box;
       position: relative;
     }
 
-    /* שעון בצד ימין למעלה */
+    /* שעון */
     #clock {
       position: absolute;
-      top: 25px;
+      top: 20px;
       right: 40px;
       font-size: 48px;
       font-weight: 600;
-      color: #ffffff;
       text-shadow: 0 0 12px black;
     }
 
     h1 {
       font-size: 80px;
       font-weight: 800;
-      margin: 120px 0 30px 0; /* מרווח מדויק למסך 1080p */
+      margin: 140px 0 10px 0; /* הועלה למעלה */
       text-align: left;
       width: 100%;
     }
@@ -57,10 +54,10 @@
       font-weight: 300;
 
       width: 100%;
-      text-align: center; /* מרכז */
-      margin-top: 10px;
+      text-align: center;
+      margin-top: 0;
 
-      transform: translateX(-100px); /* הזזה שמאלה עדינה */
+      transform: translateX(-100px);
     }
 
     .label {
@@ -72,13 +69,10 @@
 
 <body>
 
-    <!-- שעון חי -->
     <div id="clock">00:00:00</div>
 
-    <!-- כותרת פרשת השבוע — לעדכן ידנית -->
     <h1>פרשת השבוע אחרי מות - קדושים</h1>
 
-    <!-- זמני תפילה — ממורכזים + מוזזים מעט שמאלה -->
     <div class="times">
       <div><span class="label">שחרית:</span> 9:00</div>
       <div><span class="label">מנחה:</span> 18:50</div>
@@ -86,7 +80,6 @@
     </div>
 
     <script>
-      // פונקציית שעון חי
       function updateClock() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
@@ -94,7 +87,6 @@
         const s = String(now.getSeconds()).padStart(2, '0');
         document.getElementById("clock").textContent = `${h}:${m}:${s}`;
       }
-
       setInterval(updateClock, 1000);
       updateClock();
     </script>
