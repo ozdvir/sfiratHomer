@@ -23,9 +23,6 @@
       position: relative;
     }
 
-    /* -----------------------------
-       מיקום וגודל השעון + תאריך + עומר
-       ----------------------------- */
     #top-info {
       position: absolute;
       top: 20px;
@@ -52,9 +49,6 @@
       color: #00ffe5;
     }
 
-    /* -----------------------------
-       מיקום וגודל הכותרת
-       ----------------------------- */
     h1 {
       position: absolute;
       top: 180px;
@@ -64,9 +58,6 @@
       margin: 0;
     }
 
-    /* -----------------------------
-       מיקום וגודל זמני התפילה
-       ----------------------------- */
     .times {
       position: absolute;
       top: 300px;
@@ -102,7 +93,6 @@
     </div>
 
     <script>
-      /* שעון חי */
       function updateClock() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
@@ -114,7 +104,6 @@
       updateClock();
 
 
-      /* המרת מספר (1–30) ליום בחודש באותיות */
       function dayNumberToHebrew(num) {
         const letters = {
           1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
@@ -141,7 +130,6 @@
       }
 
 
-      /* המרת שנה עברית (5786 → תשפ"ו) */
       function yearNumberToHebrew(yearNum) {
         const letters = {
           1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",
@@ -171,7 +159,6 @@
       }
 
 
-      /* תאריך עברי אוטומטי */
       function getHebrewDate() {
         const now = new Date();
         const options = { calendar: "hebrew", day: "numeric", month: "long", year: "numeric" };
@@ -179,8 +166,11 @@
 
         const parts = hebrew.split(" ");
         const day = parseInt(parts[0]);
-        const month = parts[1];
+        let month = parts[1];
         const year = parseInt(parts[2]);
+
+        // ✔️ ניקוי "ב" בתחילת שם החודש
+        if (month.startsWith("ב")) month = month.substring(1);
 
         const dayHeb = dayNumberToHebrew(day);
         const yearHeb = yearNumberToHebrew(year);
@@ -192,7 +182,6 @@
       }
 
 
-      /* ספירת העומר לפי תאריך עברי — מדויק */
       function getOmer() {
         const { day, month } = getHebrewDate();
 
@@ -224,8 +213,8 @@
         document.getElementById("omer").textContent = text;
       }
 
-      /* מפעיל אחרי טעינת התאריך */
-      setTimeout(getOmer, 50);
+      // ✔️ מפעיל אחרי שהתאריך נטען
+      setTimeout(getOmer, 100);
     </script>
 
 </body>
