@@ -1,80 +1,101 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>שבת בבית הכנסת</title>
+  <meta charset="UTF-8">
+  <title>שבת בבית הכנסת</title>
 
-<style>
+  <style>
     body {
-        margin: 0;
-        padding: 0;
-        font-family: "Heebo", Arial, sans-serif;
-        background-image: url("background.jpg");
-        background-size: cover;
-        background-position: center;
-        height: 100vh;
-        color: white;
-        text-shadow: 0 0 12px black;
-        }
+      margin: 0;
+      padding: 0;
+      font-family: "Heebo", Arial, sans-serif;
 
-    .overlay {
-        background: rgba(0,0,0,0.55);
-        width: 100%;
-        height: 100%;
-        padding: 40px;
-        box-sizing: border-box;
+      /* רקע מהתמונה שלך ב‑GitHub (קישור RAW) */
+      background-image: url("https://raw.githubusercontent.com/ozdvir/sfiratHomer/main/%D7%A9%D7%91%D7%AA%20%D7%A9%D7%9C%D7%95%D7%9D.webp");
+
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+
+      color: #ffffff;
+      text-shadow: 0 0 10px black;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      padding: 60px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* שעון בצד ימין למעלה */
+    #clock {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      font-weight: 600;
+      color: #ffffff;
+      text-shadow: 0 0 12px black;
     }
 
     h1 {
-        font-size: 70px;
-        margin-bottom: 40px;
-        font-weight: 700;
+      font-size: 70px;
+      font-weight: 800;
+      margin: 80px 0 20px 0; /* מרווח מהשעון */
+      text-align: left;
+      width: 100%;
     }
 
     .times {
-        font-size: 48px;
-        line-height: 1.8;
+      font-size: 32px;
+      line-height: 1.6;
+      font-weight: 300;
+
+      width: 100%;
+      text-align: center; /* מרכז */
+      margin-top: 10px;
+
+      transform: translateX(-120px); /* הזזה שמאלה */
     }
-</style>
+
+    .label {
+      font-weight: 600;
+      color: #ffd86b;
+    }
+  </style>
 </head>
 
 <body>
-<div class="overlay">
-    <h1 id="parasha">טוען פרשת השבוע...</h1>
 
+    <!-- שעון חי -->
+    <div id="clock">00:00:00</div>
+
+    <!-- כותרת פרשת השבוע — לעדכן ידנית -->
+    <h1>פרשת השבוע אחרי מות - קדושים</h1>
+
+    <!-- זמני תפילה — ממורכזים + מוזזים שמאלה -->
     <div class="times">
-        <div id="shacharit">שחרית: 9:00</div>
-        <div id="mincha">מנחה: ...</div>
-        <div id="arvit">ערבית וצאת שבת: ...</div>
+      <div><span class="label">שחרית:</span> 9:00</div>
+      <div><span class="label">מנחה:</span> 18:50</div>
+      <div><span class="label">ערבית וצאת שבת:</span> 19:56</div>
     </div>
-</div>
 
-<script>
-// --- פרשת השבוע ---
-fetch("https://www.chabad.org/calendar/api/v2/?mode=day&cfg=json&date=today")
-    .then(r => r.json())
-    .then(data => {
-        const parsha = data.items.find(x => x.category === "parsha");
-        if (parsha) {
-            document.getElementById("parasha").innerText =
-                "פרשת השבוע " + parsha.hebrew;
-        }
-    });
+    <script>
+      // פונקציית שעון חי
+      function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById("clock").textContent = `${h}:${m}:${s}`;
+      }
 
-// --- זמני תפילה לפי חב״ד ---
-// locationid = נתניה (אפשר לשנות)
-fetch("https://www.chabad.org/calendar/api/v2/?mode=day&cfg=json&date=today&locationid=293")
-    .then(r => r.json())
-    .then(data => {
-        const zmanim = data.zmanim;
-
-        document.getElementById("mincha").innerText =
-            "מנחה: " + zmanim.minchaGedola;
-
-        document.getElementById("arvit").innerText =
-            "ערבית וצאת שבת: " + zmanim.tzaitShabbat;
-    });
-</script>
+      setInterval(updateClock, 1000);
+      updateClock();
+    </script>
 
 </body>
 </html>
