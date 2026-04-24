@@ -15,7 +15,9 @@
 
       background-size: cover;
       background-position: center;
+      width: 100vw;
       height: 100vh;
+      overflow: hidden;
 
       color: #ffffff;
       text-shadow: 0 0 10px black;
@@ -25,7 +27,7 @@
       justify-content: flex-start;
       align-items: flex-start;
 
-      padding: 60px;
+      padding: 50px 70px;
       box-sizing: border-box;
       position: relative;
     }
@@ -33,32 +35,32 @@
     /* שעון בצד ימין למעלה */
     #clock {
       position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 40px;
+      top: 25px;
+      right: 40px;
+      font-size: 48px;
       font-weight: 600;
       color: #ffffff;
       text-shadow: 0 0 12px black;
     }
 
     h1 {
-      font-size: 70px;
+      font-size: 80px;
       font-weight: 800;
-      margin: 80px 0 20px 0; /* מרווח מהשעון */
+      margin: 120px 0 30px 0; /* מרווח מדויק למסך 1080p */
       text-align: left;
       width: 100%;
     }
 
     .times {
-      font-size: 32px;
-      line-height: 1.6;
+      font-size: 38px;
+      line-height: 1.7;
       font-weight: 300;
 
       width: 100%;
       text-align: center; /* מרכז */
       margin-top: 10px;
 
-      transform: translateX(-120px); /* הזזה שמאלה */
+      transform: translateX(-100px); /* הזזה שמאלה עדינה */
     }
 
     .label {
@@ -76,7 +78,7 @@
     <!-- כותרת פרשת השבוע — לעדכן ידנית -->
     <h1>פרשת השבוע אחרי מות - קדושים</h1>
 
-    <!-- זמני תפילה — ממורכזים + מוזזים שמאלה -->
+    <!-- זמני תפילה — ממורכזים + מוזזים מעט שמאלה -->
     <div class="times">
       <div><span class="label">שחרית:</span> 9:00</div>
       <div><span class="label">מנחה:</span> 18:50</div>
