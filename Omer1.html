@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ספירת העומר - אביב רענן</title>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: url('https://ozdvir.github.io/sfiratHomer/רקע%20שיבולים.jpg')
+            no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(3px);
+            z-index: 1;
+        }
+
+        /* עטיפה למסך מלא */
+        #fullscreenLayer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* חלון ספירת העומר */
+        .omer-card {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            padding: 15px;
+            border-radius: 20px;
+            width: 260px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .hebrew-date { font-size: 1.4em; color: #2d5a27; font-weight: bold; }
+        .gregorian-date { font-size: 0.9em; color: #444; margin-bottom: 10px; }
+        .omer-count { font-size: 2.4em; font-weight: 900; color: #2d5a27; }
+        .weeks-detail { font-size: 1em; color: #2d5a27; }
+
+        /* וידאו מותאם 16:9 */
+        .youtube-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: calc(100vw * 9 / 16);
+            max-height: 100vh;
+            max-width: calc(100vh * 16 / 9);
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .youtube-wrapper iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* כותרת */
+        .video-title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+
+            font-size: 2em;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+
+        /* שעון */
+        .clock-box {
+            position: absolute;
+            top: 20px;
+            left: 250px;
+            z-index: 9999;
+
+            background: rgba(255,255,255,0.85);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2d5a27;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+        }
+
+        /* כפתורי שליטה */
+        .control-btn {
+            position: fixed;
+            bottom: 20px;
+            z-index: 9999;
+
+            background: rgba(255,255,255,0.85);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        body:hover .control-btn {
+            opacity: 1;
+        }
+
+        #muteBtn { right: 20px; }
+        #fullscreenBtn { right: 150px; }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<!-- עטיפה למסך מלא -->
+<div id="fullscreenLayer">
+
+    <!-- וידאו -->
+    <div class="youtube-wrapper" id="videoContainer">
+        <iframe id="ytplayer"
+            src="https://www.youtube.com/embed/videoseries?list=PLDNQ47_zl2WL2dzbIqPd_jjkHiKVaRkqy&autoplay=1&mute=1&loop=1&controls=0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <!-- חלון ספירת העומר -->
+    <div class="omer-card" id="omerCard">
+        <div id="hebrew-date" class="hebrew-date">ספירת העומר</div>
+        <div id="gregorian-date" class="gregorian-date"></div>
+        <div id="omer-num" class="omer-count">--</div>
+        <div id="omer-details" class="weeks-detail"></div>
+    </div>
+
+    <!-- כותרת 
+    <div class="video-title">כוחו של יהודי בספירת העומר</div>
+    -->
+    
+    <!-- שעון -->
+    <div class="clock-box" id="clock">00:00:00</div>
+
+</div>
+
+<!-- כפתור השתקה -->
+<button class="control-btn" id="muteBtn">בטל השתקה 🔊</button>
+
+<!-- כפתור מסך מלא -->
+<button class="control-btn" id="fullscreenBtn">מסך מלא ⛶</button>
+
+<script>
+    /* גימטריה */
+    function getGematria(num) {
+        const letters = ["", "א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ז'", "ח'", "ט'", "י'", "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'", "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"];
+        return letters[num] || num;
+    }
+
+    /* עדכון ספירת העומר */
+    async function updateOmerFromApi() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
+        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&start=${todayStr}&end=${todayStr}&o=on&i=on&hebdate=on`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            document.getElementById('gregorian-date').innerText =
+                now.toLocaleDateString('he-IL');
+
+            if (data.hebrew) {
+                document.getElementById('hebrew-date').innerText = data.hebrew;
+            }
+
+            const omerItem = data.items && data.items.find(e =>
+                e.category === 'omer' ||
+                (e.title && e.title.toLowerCase().includes('omer'))
+            );
+
+            if (!omerItem) return;
+
+            const match = omerItem.title.match(/(\d+)[a-z]{2}\s+day/i);
+            let dayNum = match ? parseInt(match[1], 10) : null;
+
+            if (!dayNum) return;
+
+            if (now.getHours() >= 19) {
+                dayNum += 1;
+            }
+
+            document.getElementById('omer-num').innerText = dayNum;
+
+            const weeks = Math.floor(dayNum / 7);
+            const days = dayNum % 7;
+
+            let detail = '';
+            if (weeks > 0) {
+                const weekText = weeks === 1
+                    ? 'שבוע אחד'
+                    : `${getGematria(weeks).replace("'", "")} שבועות`;
+                detail = `שהם ${weekText}`;
+                if (days > 0) {
+                    const dayText = days === 1
+                        ? 'יום אחד'
+                        : `${getGematria(days)} ימים`;
+                    detail += ` ו-${dayText}`;
+                }
+            } else {
+                detail = 'שבוע ראשון לספירה';
+            }
+
+            document.getElementById('omer-details').innerText = detail;
+
+        } catch (err) {
+            console.error('שגיאה בשליפת נתוני ספירת העומר:', err);
+        }
+    }
+
+    updateOmerFromApi();
+
+    setInterval(() => {
+        location.reload();
+    }, 3600000);
+
+    /* שעון חי */
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById("clock").innerText = `${h}:${m}:${s}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* כפתור השתקה */
+    const muteBtn = document.getElementById("muteBtn");
+    let isMuted = true;
+
+    muteBtn.onclick = () => {
+        isMuted = !isMuted;
+        const iframe = document.getElementById("ytplayer");
+        const base = "https://www.youtube.com/embed/videoseries?list=PLDNQ47_zl2WL2dzbIqPd_jjkHiKVaRkqy";
+
+        iframe.src = base + `&autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0`;
+
+        muteBtn.innerText = isMuted ? "בטל השתקה 🔊" : "השתק 🔇";
+    };
+
+    /* כפתור מסך מלא */
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const fullscreenLayer = document.getElementById("fullscreenLayer");
+
+    fullscreenBtn.onclick = () => {
+        if (!document.fullscreenElement) {
+            fullscreenLayer.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    };
+</script>
+
+</body>
+</html>
