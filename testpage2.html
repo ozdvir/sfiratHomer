@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>שבת בבית הכנסת - נתניה (חב"ד)</title>
+  <style>
+    /* הגדרות רקע וגופנים */
+    body { 
+      margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh; 
+      font-family: "Heebo", Arial, sans-serif; 
+      background-image: url("https://raw.githubusercontent.com/ozdvir/sfiratHomer/main/%D7%A9%D7%91%D7%AA%20%D7%A9%D7%9C%D7%95%D7%9D.webp"); 
+      background-size: cover; background-position: center; 
+      color: #ffffff; text-shadow: 0 0 12px black; position: relative; 
+    }
+
+    /* מיקום השעון והתאריך - פינה ימנית עליונה */
+    #top-info { position: absolute; top: 20px; right: 40px; text-align: right; }
+    #clock { font-size: 48px; font-weight: 600; }
+    #hebrew-date { font-size: 32px; margin-top: 5px; font-weight: 500; color: #ffd86b; }
+    #omer { font-size: 32px; margin-top: 5px; font-weight: 500; color: #00ffe5; }
+
+    /* כותרת הפרשה - ממוקמת גבוה וממורכזת */
+    h1 { position: absolute; top: 50px; width: 100%; text-align: center; font-size: 85px; font-weight: 800; margin: 0; }
+    
+    /* זמני התפילה - ממוקמים מתחת לכותרת */
+    .times { 
+      position: absolute; top: 180px; left: 50%; transform: translateX(-50%); 
+      font-size: 42px; line-height: 1.6; font-weight: 300; text-align: center; width: 100%;
+    }
+    .label { font-weight: 600; color: #ffd86b; }
+    .hidden { display: none; }
+  </style>
+</head>
+
+<body>
+  <div id="top-info">
+    <div id="clock">00:00:00</div>
+    <div id="hebrew-date">טוען תאריך...</div>
+    <div id="omer"></div>
+  </div>
+
+  <h1 id="parasha-title">טוען פרשה...</h1>
+
+  <div class="times">
+    <div id="mevarchim-row" class="hidden"><span class="label">תהילים:</span> 7:15</div>
+    
+    <div><span class="label">כניסת שבת:</span> <span id="time-candles">--:--</span></div>
+    <div><span class="label">שחרית:</span> 9:00</div>
+    
+    <div><span class="label">מנחה ערב שבת:</span> <span id="mincha-time">--:--</span></div>
+    
+    <div><span class="label">ערבית ויציאת שבת:</span> <span id="time-havdalah">--:--</span></div>
+  </div>
+
+  <script>
+    /**
+     * פונקציה להמרת מספרים לאותיות (גימטריה)
+     */
+    function toGimatria(num) {
+      const map = {1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",10:"י",20:"כ",30:"ל",40:"מ",50:"נ",60:"ס",70:"ע",80:"פ",90:"צ",100:"ק",200:"ר",300:"ש",400:"ת"};
+      if (num === 15) return "ט״ו";
+      if (num === 16) return "ט״ז";
+      let res = "";
+      let n = num;
+      [400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1].forEach(val => {
+        while (n >= val) { res += map[val]; n -= val; }
+      });
+      return res.length > 1 ? res.slice(0,-1) + "״" + res.slice(-1) : res + "׳";
+    }
+
+    /**
+     * עדכון השעון בכל שנייה
+     */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clock").textContent = now.toLocaleTimeString('he-IL', {hour12: false});
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /**
+     * משיכת נתונים מהאינטרנט לפי אזור נתניה ונוסח חב"ד
+     */
+    async function updateData() {
+      try {
+        // הכתובת מעודכנת לעיר נתניה (city=IL-Netanya) וכוללת זמן חב"ד (M=on)
+        const response = await fetch("https://www.hebcal.com/shabbat?cfg=json&city=IL-Netanya&M=off");
+        const data = await response.json();
+        
+        // 1. עדכון שם הפרשה
+        const parasha = data.items.find(item => item.category === "parashat");
+        if (parasha) {
+          document.getElementById("parasha-title").textContent = "שבת קודש פרשת " + parasha.hebrew;
+        }
+
+        // 2. עדכון זמני הדלקת נרות
+        const candles = data.items.find(item => item.category === "candles");
+        if (candles) {
+          const cDate = new Date(candles.date);
+          const timeStr = cDate.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
+          document.getElementById("time-candles").textContent = timeStr;
+          
+          // מנחה ערב שבת בחב"ד היא בזמן הדלקת נרות
+          document.getElementById("mincha-time").textContent = timeStr;
+        }
+
+        // 3. עדכון צאת השבת (לפי אדמו"ר הזקן)
+        const havdalah = data.items.find(item => item.category === "havdalah");
+        if (havdalah) {
+          document.getElementById("time-havdalah").textContent = new Date(havdalah.date).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
+        }
+
+        // 4. בדיקת שבת מברכים
+        const isMevarchim = data.items.some(item => item.memo && item.memo.includes("Mevarchim Chodesh"));
+        if (isMevarchim) {
+          document.getElementById("mevarchim-row").classList.remove("hidden");
+        }
+
+      } catch (e) {
+        console.error("שגיאה בתקשורת עם השרת");
+      }
+
+      // --- הצגת תאריך עברי בגימטריה ---
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('he-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' });
+      const parts = formatter.formatToParts(now);
+      const day = parseInt(parts.find(p => p.type === 'day').value);
+      const monthStr = parts.find(p => p.type === 'month').value;
+      const year = parseInt(parts.find(p => p.type === 'year').value);
+      
+      document.getElementById("hebrew-date").textContent = `${toGimatria(day)} ב${monthStr.replace('ב', '')} ${toGimatria(year % 1000)}`;
+
+      // --- חישוב ספירת העומר ---
+       let omerDay = 0;
+       if (monthStr.includes("ניסן")) omerDay = day - 15;
+        else if (monthStr.includes("אייר")) omerDay = 15 + day;
+        else if (monthStr.includes("סיון")) omerDay = 44 + day;
+       if (omerDay > 0 && omerDay <= 49) {
+        document.getElementById("omer").textContent = `היום ${toGimatria(omerDay)} לעומר`;
+      }
+    }
+
+    // הפעלת הפונקציה
+    updateData();
+  </script>
+</body>
+</html>
