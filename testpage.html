@@ -32,19 +32,17 @@
   </div>
 
   <script>
-    // פונקציה להמרת מספרים לאותיות עבריות (גימטריה)
-    function toHebrewDateStr(day, monthName, year) {
-      const gimatria = (n) => {
-        const letters = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת"];
-        let res = "";
-        if (n === 15) return "ט״ו";
-        if (n === 16) return "ט״ו"; // למעשה ט״ז
-        // פישוט להצגת תאריך בסיסית
-        return n.toString(); // אם תרצה לוגיקה מלאה של גימטריה מורכבת זה דורש ספרייה חיצונית
-      };
-      
-      // שימוש בפורמט מובנה של JS שהוא אמין יותר
-      return `${day} ב${monthName} ${year}`;
+    // פונקציית המרה לגימטריה
+    function toGimatria(num) {
+      const map = {1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו",7:"ז",8:"ח",9:"ט",10:"י",20:"כ",30:"ל",40:"מ",50:"נ",60:"ס",70:"ע",80:"פ",90:"צ",100:"ק",200:"ר",300:"ש",400:"ת"};
+      if (num === 15) return "ט״ו";
+      if (num === 16) return "ט״ז";
+      let res = "";
+      let n = num;
+      [400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1].forEach(val => {
+        while (n >= val) { res += map[val]; n -= val; }
+      });
+      return res.length > 1 ? res.slice(0,-1) + "״" + res.slice(-1) : res + "׳";
     }
 
     function updateClock() {
@@ -67,15 +65,16 @@
         if (havdalah) document.getElementById("time-havdalah").textContent = new Date(havdalah.date).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
       } catch (e) {}
 
-      // הצגת תאריך עברי בצורה נקייה
+      // המרת התאריך לגימטריה
       const now = new Date();
-      const hebrewDate = new Intl.DateTimeFormat('he-u-ca-hebrew', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      }).format(now);
+      const formatter = new Intl.DateTimeFormat('he-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' });
+      const parts = formatter.formatToParts(now);
       
-      document.getElementById("hebrew-date").textContent = hebrewDate;
+      const day = parseInt(parts.find(p => p.type === 'day').value);
+      const month = parts.find(p => p.type === 'month').value.replace('ב', '');
+      const year = parseInt(parts.find(p => p.type === 'year').value);
+      
+      document.getElementById("hebrew-date").textContent = `${toGimatria(day)} ב${month} ${toGimatria(year % 1000)}`;
     }
 
     updateData();
