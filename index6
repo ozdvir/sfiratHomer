@@ -1,0 +1,860 @@
+<!doctype html>
+<!--
+  ============================================================
+  אתר בית חב"ד — קובץ אחד ויחיד (index.html)
+  ============================================================
+  כל האתר נמצא בקובץ הזה בלבד: אין צורך בקבצים נוספים.
+  כדי להעלות ל־GitHub: מעלים את הקובץ הזה כמו שהוא (ראו גם
+  את ההסבר בתחתית הדף עצמו, בסעיף "איך מעלים את האתר ל־GitHub").
+
+  איפה משנים את סרטון היוטיוב?
+  גללו לתחתית הקובץ, לבלוק "הגדרות חלון היוטיוב" בתחילת
+  התסריט (חפשו את המילה YOUTUBE). שם אפשר לבחור:
+    • רשימת סרטונים (playlist) שמתנגנת שוב ושוב
+    • סרטון יחיד שמתנגן בלולאה אינסופית
+  אפשר גם לשנות ישירות מהדף: כפתורי הבחירה ושדה הדבקת
+  הקישור נמצאים מתחת לחלון היוטיוב (השינוי מהדף תקף רק
+  לביקור הנוכחי; לשינוי קבוע עורכים את ההגדרות בקוד).
+  ============================================================
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <!-- התאמה למסכי נייד -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- אייקון ריק: מונע מהדפדפן לחפש favicon.ico שלא קיים -->
+    <link rel="icon" href="data:," />
+    <title>אתר בית חב"ד</title>
+
+    <!-- גופנים מגוגל: Frank Ruhl Libre לכותרות, Heebo לטקסט רגיל -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ============================================================
+         צבעי האתר — משתנים מרכזיים
+         לשינוי צבע בכל האתר מספיק לשנות את הערכים כאן.
+         ============================================================ */
+      :root {
+        color-scheme: light dark;
+        --bg: #f2f5f9;            /* רקע הדף */
+        --surface: #ffffff;       /* רקע כרטיסים */
+        --ink: #1b2a3d;           /* צבע טקסט ראשי */
+        --ink-soft: #51606f;      /* צבע טקסט משני */
+        --header-bg: #0d2242;     /* רקע הפס העליון (כחול כהה) */
+        --header-ink: #f4f1e8;    /* טקסט בפס העליון */
+        --header-soft: #a9bcd4;   /* טקסט משני בפס העליון */
+        --gold: #c9a227;          /* זהב — הדגשות וקווים */
+        --gold-bright: #e3c565;   /* זהב בהיר */
+        --line: #d8dfe8;          /* קווי מסגרת */
+        --shadow: 0 18px 45px rgba(13, 34, 66, 0.16);
+      }
+      /* צבעים למצב כהה (לפי הגדרת מערכת ההפעלה של המבקר) */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #081120;
+          --surface: #0e1e38;
+          --ink: #ece8dc;
+          --ink-soft: #9fb0c3;
+          --header-bg: #061528;
+          --header-ink: #f4f1e8;
+          --header-soft: #93a9c4;
+          --gold: #d4af37;
+          --gold-bright: #ecd27f;
+          --line: #22354f;
+          --shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Heebo", "Assistant", "Segoe UI", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ============================================================
+         הפס העליון: שעון (ימין) · פרשת השבוע (מרכז) · תאריך (שמאל)
+         ============================================================ */
+      .topbar {
+        background: var(--header-bg);
+        color: var(--header-ink);
+        border-bottom: 3px solid var(--gold);
+        padding: 20px clamp(16px, 4vw, 48px) 22px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px 24px;
+      }
+
+      .clock-block { justify-self: start; text-align: right; }
+      .clock {
+        font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+        font-weight: 600;
+        line-height: 1.05;
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+        direction: ltr;
+        unicode-bidi: embed;
+      }
+      .clock-caption {
+        margin-top: 4px;
+        font-size: 0.82rem;
+        font-weight: 400;
+        color: var(--header-soft);
+        letter-spacing: 0.06em;
+      }
+
+      .parasha-block { text-align: center; min-width: 0; }
+      .parasha-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        color: var(--gold-bright);
+      }
+      .parasha-label svg { flex: none; }
+      .parasha-name {
+        margin: 2px 0 0;
+        font-family: "Frank Ruhl Libre", "Times New Roman", serif;
+        font-size: clamp(2rem, 5.5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        color: var(--header-ink);
+      }
+      .parasha-date {
+        margin-top: 4px;
+        font-size: 0.9rem;
+        color: var(--header-soft);
+      }
+
+      .today-block { justify-self: end; text-align: left; }
+      .today-hebrew {
+        font-family: "Frank Ruhl Libre", "Times New Roman", serif;
+        font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+        font-weight: 500;
+        line-height: 1.25;
+      }
+      .today-greg {
+        margin-top: 3px;
+        font-size: 0.86rem;
+        color: var(--header-soft);
+      }
+
+      /* ============================================================
+         אזור התוכן הראשי
+         ============================================================ */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: clamp(24px, 5vh, 56px) clamp(16px, 4vw, 48px);
+        width: 100%;
+      }
+
+      /* ---------- חלון היוטיוב ---------- */
+      .video-section { width: min(980px, 100%); }
+      .video-heading {
+        margin: 0 0 14px;
+        text-align: center;
+        font-family: "Frank Ruhl Libre", "Times New Roman", serif;
+        font-size: clamp(1.25rem, 3vw, 1.7rem);
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .video-heading .accent { color: var(--gold); }
+      .video-frame {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .video-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+      }
+      .video-link {
+        margin: 14px 0 0;
+        text-align: center;
+        font-size: 0.95rem;
+      }
+      .video-link a {
+        color: var(--ink);
+        font-weight: 500;
+        text-decoration: none;
+        border-bottom: 1px solid var(--gold);
+        padding-bottom: 2px;
+      }
+      .video-link a:hover, .video-link a:focus-visible {
+        color: var(--gold);
+      }
+      /* הודעת גיבוי כשהנגן לא נטען (מוסתרת בדרך כלל) */
+      .video-fallback {
+        margin: 8px 0 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--ink-soft);
+      }
+      .video-fallback a {
+        color: var(--ink);
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 1px solid var(--gold);
+        padding-bottom: 1px;
+      }
+
+      /* ---------- כפתורי בחירת מקור היוטיוב (מתחת לנגן) ---------- */
+      .video-controls {
+        margin-top: 18px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .controls-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .controls-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--ink);
+        min-width: 92px;
+      }
+      /* כפתור מצב: המצב הנבחר מסומן בצבע זהב */
+      .mode-btn {
+        font-family: inherit;
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--ink);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 18px;
+        cursor: pointer;
+      }
+      .mode-btn:hover { border-color: var(--gold); }
+      .mode-btn[aria-pressed="true"] {
+        background: var(--header-bg);
+        color: var(--header-ink);
+        border-color: var(--gold);
+      }
+      .mode-btn:focus-visible, .apply-btn:focus-visible, .url-input:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+      }
+      /* שדה הדבקת קישור + כפתור "הצג" */
+      .url-input {
+        flex: 1 1 260px;
+        font-family: inherit;
+        font-size: 0.92rem;
+        color: var(--ink);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 12px;
+        direction: ltr;
+        text-align: left;
+      }
+      .apply-btn {
+        font-family: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: var(--header-ink);
+        background: var(--header-bg);
+        border: 1px solid var(--gold);
+        border-radius: 8px;
+        padding: 9px 22px;
+        cursor: pointer;
+      }
+      .apply-btn:hover { background: var(--gold); color: #141414; }
+      .controls-note {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+      .controls-msg {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--gold);
+        min-height: 1.2em;
+      }
+
+      /* ---------- סעיף ההוראות (נפתח בלחיצה) ---------- */
+      .guide {
+        width: min(980px, 100%);
+        margin-top: 34px;
+      }
+      .guide-heading {
+        margin: 0 0 12px;
+        text-align: center;
+        font-family: "Frank Ruhl Libre", "Times New Roman", serif;
+        font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .guide details {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        overflow: hidden;
+      }
+      .guide summary {
+        cursor: pointer;
+        padding: 14px 18px;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--ink);
+        list-style: none;
+      }
+      .guide summary::-webkit-details-marker { display: none; }
+      .guide summary::after {
+        content: "+";
+        float: left;
+        font-weight: 700;
+        color: var(--gold);
+        font-size: 1.15rem;
+        line-height: 1;
+      }
+      .guide details[open ] summary::after { content: "–"; }
+      .guide .guide-body {
+        padding: 0 18px 16px;
+        font-size: 0.94rem;
+        line-height: 1.7;
+        color: var(--ink);
+      }
+      .guide .guide-body ol, .guide .guide-body ul { margin: 6px 0; padding-inline-start: 22px; }
+      .guide .guide-body li { margin-bottom: 5px; }
+      .guide code {
+        direction: ltr;
+        unicode-bidi: embed;
+        font-family: "Consolas", "Menlo", monospace;
+        font-size: 0.86em;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 1px 6px;
+      }
+      .guide .id-example {
+        direction: ltr;
+        text-align: left;
+        font-family: "Consolas", "Menlo", monospace;
+        font-size: 0.84rem;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .guide .id-example b { color: var(--gold); }
+
+      footer {
+        padding: 14px 16px 20px;
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+      }
+      footer a { color: var(--ink-soft); }
+
+      /* ============================================================
+         מסכים קטנים: הפרשה למעלה, שעון ותאריך מתחתיה זה לצד זה
+         ============================================================ */
+      @media (max-width: 640px) {
+        .topbar {
+          grid-template-columns: 1fr 1fr;
+          grid-template-areas:
+            "parasha parasha"
+            "clock today";
+          row-gap: 14px;
+          padding-top: 16px;
+          padding-bottom: 18px;
+        }
+        .parasha-block { grid-area: parasha; }
+        .clock-block { grid-area: clock; }
+        .today-block { grid-area: today; }
+        .controls-label { min-width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== הפס העליון ==================== -->
+    <header class="topbar">
+      <!-- ימין: שעון חי לפי שעון ישראל -->
+      <div class="clock-block">
+        <div class="clock" id="clock" role="timer" aria-label="השעה כעת בישראל">--:--:--</div>
+        <div class="clock-caption">שעון ישראל</div>
+      </div>
+
+      <!-- מרכז: פרשת השבוע -->
+      <div class="parasha-block">
+        <span class="parasha-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3 L21 19 L3 19 Z M12 21 L3 5 L21 5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+          פרשת השבוע
+        </span>
+        <h1 class="parasha-name" id="parashaName">…</h1>
+        <div class="parasha-date" id="parashaDate"></div>
+      </div>
+
+      <!-- שמאל: התאריך של היום -->
+      <div class="today-block">
+        <div class="today-hebrew" id="hebrewDate"></div>
+        <div class="today-greg" id="gregDate"></div>
+      </div>
+    </header>
+
+    <main>
+      <!-- ==================== חלון היוטיוב ====================
+           הנגן עצמו (iframe) מקבל את הכתובת מהתסריט למטה,
+           לפי ההגדרות בבלוק YOUTUBE. כאן לא צריך לשנות כלום. -->
+      <section class="video-section" aria-label="סרטונים מיוטיוב">
+        <h2 class="video-heading">שיעורים וסרטונים <span class="accent">מערוץ חב"ד</span></h2>
+        <div class="video-frame">
+          <iframe
+            id="ytPlayer"
+            src=""
+            title="נגן יוטיוב — שיעורים וסרטונים מערוץ חב״ד"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+        <p class="video-link">
+          <a id="ytWatchLink" href="https://www.youtube.com/channel/UCc0y_E87EUnOW2m2mGJU9Gg" target="_blank" rel="noopener">לצפייה בכל הסרטונים בערוץ היוטיוב של Chabad.org</a>
+        </p>
+        <!-- הודעת גיבוי: מופיעה רק אם חלון הנגן לא סיים להיטען (ראו בתסריט למטה) -->
+        <p class="video-fallback" id="videoFallback" hidden>
+          הנגן לא נטען? אפשר לצפות ישירות
+          <a id="ytFallbackLink" href="https://www.youtube.com/channel/UCc0y_E87EUnOW2m2mGJU9Gg" target="_blank" rel="noopener">ביוטיוב</a>.
+        </p>
+
+        <!-- ============ בחירת מקור הסרטון (מהדף) ============
+             הכפתורים והשדה כאן משנים את מה שרץ בנגן, לביקור
+             הנוכחי בלבד. לשינוי קבוע — עורכים את בלוק YOUTUBE
+             בתסריט שבתחתית הקובץ (הסבר מלא בסעיף ההוראות). -->
+        <div class="video-controls" aria-label="בחירת מקור הסרטון">
+          <div class="controls-row" role="group" aria-label="סוג הניגון">
+            <span class="controls-label">מה לנגן:</span>
+            <button type="button" class="mode-btn" id="btnPlaylist" aria-pressed="true">רשימת סרטונים</button>
+            <button type="button" class="mode-btn" id="btnVideo" aria-pressed="false">סרטון יחיד</button>
+            <button type="button" class="mode-btn" id="btnLoop" aria-pressed="true">לולאה: מופעל</button>
+          </div>
+          <div class="controls-row">
+            <span class="controls-label">קישור אחר:</span>
+            <input type="text" class="url-input" id="ytUrlInput" placeholder="הדביקו כאן קישור לסרטון או לרשימת השמעה מיוטיוב…" />
+            <button type="button" class="apply-btn" id="btnApplyUrl">הצג</button>
+          </div>
+          <p class="controls-msg" id="controlsMsg" role="status"></p>
+          <p class="controls-note">
+            השינוי מהכפתורים ומהשדה כאן תקף רק כל עוד הדף פתוח. כדי שהשינוי יישמר תמיד,
+            מעדכנים את ההגדרות בקוד — הסבר מלא בסעיף הראשון של ההוראות למטה.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== הוראות שימוש ==================== -->
+      <section class="guide" aria-label="הוראות לעדכון האתר">
+        <h2 class="guide-heading">הוראות: עדכון הסרטון והעלאת האתר</h2>
+
+        <details open>
+          <summary>איך מעדכנים את חלון היוטיוב?</summary>
+          <div class="guide-body">
+            <p>יש שתי דרכים — מהדף עצמו לשינוי מהיר, או מהקוד לשינוי קבוע:</p>
+            <p><strong>דרך מהירה (מהדף):</strong> מדביקים בשדה "קישור אחר" שמתחת לנגן קישור של סרטון או של רשימת השמעה מיוטיוב, ולוחצים "הצג". השינוי תקף רק עד סגירת הדף.</p>
+            <p><strong>דרך קבועה (מהקוד):</strong></p>
+            <ol>
+              <li>פותחים את הקובץ <code>index.html</code> בעורך טקסט (למשל Notepad או VS Code).</li>
+              <li>גוללים לתחתית הקובץ ומחפשים את בלוק ההגדרות שמתחיל במילה <code>YOUTUBE</code> (בתחילת התסריט).</li>
+              <li>מעדכנים את המזהים שם (הסבר איך מוצאים מזהה — בסעיף הבא), שומרים, ומעלים את הקובץ מחדש.</li>
+            </ol>
+            <p>באותו בלוק אפשר גם לבחור את ברירת המחדל: רשימת סרטונים או סרטון יחיד, והאם הלולאה דלוקה.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>איך מוצאים את מזהה הסרטון או הרשימה?</summary>
+          <div class="guide-body">
+            <p>המזהה הוא חלק מהקישור ביוטיוב:</p>
+            <p><strong>סרטון יחיד</strong> — המזהה מופיע אחרי <code>v=</code> בקישור:</p>
+            <p class="id-example">youtube.com/watch?v=<b>dQw4w9WgXcQ</b></p>
+            <p><strong>רשימת השמעה</strong> — המזהה מופיע אחרי <code>list=</code> בקישור:</p>
+            <p class="id-example">youtube.com/playlist?list=<b>PLxxxxxxxxxxxx</b></p>
+            <p><strong>כל הסרטונים של ערוץ</strong> — לוקחים את מזהה הערוץ (מתחיל ב־<code>UC</code>) ומחליפים את שתי האותיות הראשונות ב־<code>UU</code>. למשל, הערוץ <code>UCc0y_E87EUnOW2m2mGJU9Gg</code> הופך לרשימה <code>UUc0y_E87EUnOW2m2mGJU9Gg</code> — וזו בדיוק ברירת המחדל של האתר הזה.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>איך מריצים רשימה או סרטון בודד בלולאה?</summary>
+          <div class="guide-body">
+            <ul>
+              <li><strong>מהדף:</strong> לוחצים על "רשימת סרטונים" או על "סרטון יחיד", ומוודאים שכפתור "לולאה" במצב "מופעל". כשהלולאה דלוקה, הניגון מתחיל מחדש אוטומטית בסוף — רשימה שלמה מתנגנת שוב מההתחלה, וסרטון יחיד חוזר על עצמו.</li>
+              <li><strong>מהקוד:</strong> בבלוק <code>YOUTUBE</code> מגדירים <code>mode</code> ("playlist" לרשימה, "video" לסרטון יחיד) ו־<code>loop: true</code>.</li>
+              <li>שימו לב: ביוטיוב, לולאה של סרטון יחיד דורשת טכניקה מיוחדת (מזהה הסרטון נוסף גם כרשימה) — הקוד כאן כבר עושה זאת אוטומטית, אין צורך לגעת בזה.</li>
+              <li>הניגון מתחיל אוטומטית כשהדף נטען, במצב מושתק (כך דפדפנים מאפשרים ניגון אוטומטי). להפעלת הקול לוחצים על כפתור הרמקול בנגן עצמו. מי שמעדיף בלי ניגון אוטומטי — משנה בקוד את <code>autoplay</code> ל־<code>false</code>.</li>
+              <li>מופיעה בנגן "שגיאה 153"? זהו חסם של יוטיוב כשאין זיהוי לאתר שמטמיע את הנגן. הקוד כאן כבר משתמש בכתובת ההטמעה הרגילה של youtube.com שמעבירה את הזיהוי, ואם הנגן בכל זאת לא נטען — מופיע מתחתיו קישור לצפייה ישירה ביוטיוב.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>איך מעלים את האתר ל־GitHub?</summary>
+          <div class="guide-body">
+            <p>כל האתר הוא קובץ אחד — <code>index.html</code> — ולכן ההעלאה פשוטה:</p>
+            <ol>
+              <li>נכנסים לאתר <code>github.com</code> ויוצרים מאגר (Repository) חדש.</li>
+              <li>במאגר לוחצים על "uploading an existing file" ומעלים את הקובץ <code>index.html</code>.</li>
+              <li>כדי שהאתר יהיה פעיל באינטרנט: במאגר נכנסים ל־Settings ← Pages, ובוחרים את הענף הראשי (main) כמקור. אחרי דקה־שתיים האתר עולה בכתובת ש־GitHub מציג שם.</li>
+              <li>לעדכון בעתיד: מעלים שוב את הקובץ הערוך באותו מאגר (או עורכים ישירות באתר GitHub) — האתר מתעדכן לבד.</li>
+            </ol>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      פרשת השבוע לפי לוח השנה בישראל · נתוני הלוח:
+      <a href="https://www.hebcal.com" target="_blank" rel="noopener">Hebcal</a>
+    </footer>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ============================================================
+           ★★★  הגדרות חלון היוטיוב — כאן משנים את הסרטון  ★★★
+           ============================================================
+           זה המקום היחיד שצריך לערוך כדי לשנות מה מתנגן באתר.
+
+           mode — מה לנגן:
+             "playlist" = רשימת סרטונים (מתנגנים זה אחרי זה)
+             "video"    = סרטון יחיד אחד
+
+           playlistId — מזהה רשימת ההשמעה (משפיע במצב "playlist").
+             איך מוצאים מזהה? ראו בדף עצמו, בסעיף ההוראות
+             "איך מוצאים את מזהה הסרטון או הרשימה?".
+             ברירת המחדל כאן: כל הסרטונים של ערוץ Chabad.org.
+
+           videoId — מזהה הסרטון היחיד (משפיע במצב "video").
+             ברירת המחדל כאן: שיעור של Chabad.org.
+
+           loop — true: הניגון חוזר על עצמו בלולאה אינסופית.
+                  false: הניגון נעצר בסוף.
+
+           autoplay — true: הניגון מתחיל לבד כשהדף נטען (מושתק;
+                  את הקול מפעילים בכפתור הרמקול של הנגן).
+                  false: המבקר לוחץ על כפתור הניגון בעצמו.
+           ============================================================ */
+        var YOUTUBE = {
+          mode: "playlist",
+          playlistId: "UUc0y_E87EUnOW2m2mGJU9Gg",
+          videoId: "ijq-Ig7z9NA",
+          loop: true,
+          autoplay: true
+        };
+
+        /* אזור הזמן של השעון ושל חישוב התאריכים באתר */
+        var TZ = "Asia/Jerusalem";
+
+        /* ============================================================
+           טבלת פרשות השבוע (לוח ישראל), לפי תאריך השבת הלועזי.
+           מקור: Hebcal (עודכן 5.10.2026), טווח: אוקטובר 2026 – ספטמבר 2028.
+           כשהטבלה תיגמר, האתר יציג "פרשת השבוע" בלי שם — זה הסימן
+           שצריך להאריך את הטבלה בשנתיים נוספות מאתר Hebcal.
+           ============================================================ */
+        var SEDROT = {
+          "2026-10-10": "בראשית", "2026-10-17": "נח", "2026-10-24": "לך־לך", "2026-10-31": "וירא",
+          "2026-11-07": "חיי שרה", "2026-11-14": "תולדות", "2026-11-21": "ויצא", "2026-11-28": "וישלח",
+          "2026-12-05": "וישב", "2026-12-12": "מקץ", "2026-12-19": "ויגש", "2026-12-26": "ויחי",
+          "2027-01-02": "שמות", "2027-01-09": "וארא", "2027-01-16": "בא", "2027-01-23": "בשלח",
+          "2027-01-30": "יתרו", "2027-02-06": "משפטים", "2027-02-13": "תרומה", "2027-02-20": "תצוה",
+          "2027-02-27": "כי תשא", "2027-03-06": "ויקהל", "2027-03-13": "פקודי", "2027-03-20": "ויקרא",
+          "2027-03-27": "צו", "2027-04-03": "שמיני", "2027-04-10": "תזריע", "2027-04-17": "מצרע",
+          "2027-05-01": "אחרי מות", "2027-05-08": "קדשים", "2027-05-15": "אמור", "2027-05-22": "בהר",
+          "2027-05-29": "בחקתי", "2027-06-05": "במדבר", "2027-06-12": "נשא", "2027-06-19": "בהעלתך",
+          "2027-06-26": "שלח־לך", "2027-07-03": "קורח", "2027-07-10": "חוקת", "2027-07-17": "בלק",
+          "2027-07-24": "פינחס", "2027-07-31": "מטות־מסעי", "2027-08-07": "דברים", "2027-08-14": "ואתחנן",
+          "2027-08-21": "עקב", "2027-08-28": "ראה", "2027-09-04": "שופטים", "2027-09-11": "כי־תצא",
+          "2027-09-18": "כי־תבוא", "2027-09-25": "נצבים־וילך", "2027-10-09": "האזינו", "2027-10-30": "בראשית",
+          "2027-11-06": "נח", "2027-11-13": "לך־לך", "2027-11-20": "וירא", "2027-11-27": "חיי שרה",
+          "2027-12-04": "תולדות", "2027-12-11": "ויצא", "2027-12-18": "וישלח", "2027-12-25": "וישב",
+          "2028-01-01": "מקץ", "2028-01-08": "ויגש", "2028-01-15": "ויחי", "2028-01-22": "שמות",
+          "2028-01-29": "וארא", "2028-02-05": "בא", "2028-02-12": "בשלח", "2028-02-19": "יתרו",
+          "2028-02-26": "משפטים", "2028-03-04": "תרומה", "2028-03-11": "תצוה", "2028-03-18": "כי תשא",
+          "2028-03-25": "ויקהל־פקודי", "2028-04-01": "ויקרא", "2028-04-08": "צו", "2028-04-22": "שמיני",
+          "2028-04-29": "תזריע־מצרע", "2028-05-06": "אחרי מות־קדשים", "2028-05-13": "אמור", "2028-05-20": "בהר־בחקתי",
+          "2028-05-27": "במדבר", "2028-06-03": "נשא", "2028-06-10": "בהעלתך", "2028-06-17": "שלח־לך",
+          "2028-06-24": "קורח", "2028-07-01": "חוקת", "2028-07-08": "בלק", "2028-07-15": "פינחס",
+          "2028-07-22": "מטות־מסעי", "2028-07-29": "דברים", "2028-08-05": "ואתחנן", "2028-08-12": "עקב",
+          "2028-08-19": "ראה", "2028-08-26": "שופטים", "2028-09-02": "כי־תצא", "2028-09-09": "כי־תבוא",
+          "2028-09-16": "נצבים־וילך", "2028-09-23": "האזינו"
+        };
+
+        /* ---------- חיבור לאלמנטים בדף ---------- */
+        var clockEl = document.getElementById("clock");
+        var hebrewEl = document.getElementById("hebrewDate");
+        var gregEl = document.getElementById("gregDate");
+        var parashaNameEl = document.getElementById("parashaName");
+        var parashaDateEl = document.getElementById("parashaDate");
+        var playerEl = document.getElementById("ytPlayer");
+        var watchLinkEl = document.getElementById("ytWatchLink");
+        var fallbackEl = document.getElementById("videoFallback");
+        var fallbackLinkEl = document.getElementById("ytFallbackLink");
+        var btnPlaylist = document.getElementById("btnPlaylist");
+        var btnVideo = document.getElementById("btnVideo");
+        var btnLoop = document.getElementById("btnLoop");
+        var urlInput = document.getElementById("ytUrlInput");
+        var btnApplyUrl = document.getElementById("btnApplyUrl");
+        var controlsMsg = document.getElementById("controlsMsg");
+
+        /* ============================================================
+           בניית כתובת הנגן לפי ההגדרות
+           ============================================================
+           מצב רשימה: youtube.com/embed/videoseries?list=...
+           מצב סרטון: youtube.com/embed/VIDEO_ID
+           לולאת סרטון יחיד ביוטיוב דורשת גם playlist=אותו מזהה —
+           בלי זה הסרטון לא יחזור על עצמו. הקוד מוסיף זאת לבד.
+
+           למה youtube.com ולא youtube-nocookie.com?
+           הכתובת "נטולת העוגיות" (nocookie) מחזירה בחלק מהדפדפנים
+           הפנימיים של אפליקציות את "שגיאה 153 — Video player
+           configuration error", כי יוטיוב דורש שהנגן יזהה מאיזה אתר
+           הוא נטען (כותרת Referer). הכתובת הרגילה של youtube.com,
+           יחד עם המאפיין referrerpolicy שעל תגית ה־iframe למעלה,
+           מנגנת כרגיל גם שם. */
+        function buildEmbedSrc(cfg) {
+          var base = "https://www.youtube.com/embed/";
+          var params = [];
+          var src;
+          if (cfg.mode === "video") {
+            src = base + encodeURIComponent(cfg.videoId);
+            if (cfg.loop) params.push("playlist=" + encodeURIComponent(cfg.videoId));
+          } else {
+            src = base + "videoseries";
+            params.push("list=" + encodeURIComponent(cfg.playlistId));
+          }
+          if (cfg.loop) params.push("loop=1");
+          if (cfg.autoplay) params.push("autoplay=1", "mute=1");
+          params.push("playsinline=1"); /* בנייד: ניגון בתוך הדף, בלי קפיצה למסך מלא */
+          params.push("rel=0");
+          return src + "?" + params.join("&");
+        }
+
+        /* קישור "לצפייה ביוטיוב" שמתחת לנגן — מתעדכן לפי המצב */
+        function buildWatchUrl(cfg) {
+          if (cfg.mode === "video") {
+            return {
+              href: "https://www.youtube.com/watch?v=" + encodeURIComponent(cfg.videoId),
+              text: "לצפייה בסרטון ביוטיוב"
+            };
+          }
+          return {
+            href: "https://www.youtube.com/playlist?list=" + encodeURIComponent(cfg.playlistId),
+            text: "לצפייה בכל הסרטונים ברשימה ביוטיוב"
+          };
+        }
+
+        /* מצב הניגון הנוכחי בדף (מתחיל מההגדרות שבבלוק YOUTUBE) */
+        var current = {
+          mode: YOUTUBE.mode,
+          playlistId: YOUTUBE.playlistId,
+          videoId: YOUTUBE.videoId,
+          loop: YOUTUBE.loop,
+          autoplay: YOUTUBE.autoplay
+        };
+
+        /* ============================================================
+           גיבוי למקרה שהנגן לא נטען (למשל כשיוטיוב חסום ברשת):
+           אם חלון הנגן לא סיים להיטען תוך כמה שניות, תופיע מתחתיו
+           הודעה קצרה עם קישור לצפייה ישירה ביוטיוב.
+           ============================================================ */
+        var playerLoaded = false;
+        var loadTimer = null;
+        playerEl.addEventListener("load", function () {
+          playerLoaded = true;
+          if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+          fallbackEl.hidden = true;
+        });
+        function armLoadWatchdog() {
+          playerLoaded = false;
+          fallbackEl.hidden = true;
+          if (loadTimer) clearTimeout(loadTimer);
+          loadTimer = setTimeout(function () {
+            if (!playerLoaded) fallbackEl.hidden = false;
+          }, 9000);
+        }
+
+        /* מעדכן את הנגן ואת כפתורי המצב לפי current */
+        function applyPlayer(message) {
+          playerEl.src = buildEmbedSrc(current);
+          var w = buildWatchUrl(current);
+          watchLinkEl.href = w.href;
+          watchLinkEl.textContent = w.text;
+          fallbackLinkEl.href = w.href;
+          armLoadWatchdog();
+          btnPlaylist.setAttribute("aria-pressed", current.mode === "playlist" ? "true" : "false");
+          btnVideo.setAttribute("aria-pressed", current.mode === "video" ? "true" : "false");
+          btnLoop.setAttribute("aria-pressed", current.loop ? "true" : "false");
+          btnLoop.textContent = current.loop ? "לולאה: מופעל" : "לולאה: כבוי";
+          controlsMsg.textContent = message || "";
+        }
+
+        /* ---------- אירועי הכפתורים ---------- */
+        btnPlaylist.addEventListener("click", function () {
+          current.mode = "playlist";
+          applyPlayer("מציג את רשימת הסרטונים" + (current.loop ? ", בלולאה" : "") + ".");
+        });
+        btnVideo.addEventListener("click", function () {
+          current.mode = "video";
+          applyPlayer("מציג סרטון יחיד" + (current.loop ? ", בלולאה" : "") + ".");
+        });
+        btnLoop.addEventListener("click", function () {
+          current.loop = !current.loop;
+          applyPlayer(current.loop ? "הלולאה הופעלה — הניגון יחזור על עצמו." : "הלולאה כובתה — הניגון ייעצר בסוף.");
+        });
+
+        /* חילוץ מזהה מקישור יוטיוב שהודבק בשדה.
+           מזהה שלוש צורות: watch?v=..., youtu.be/..., playlist?list=...
+           מחזיר null אם הקישור לא זוהה. */
+        function parseYouTubeUrl(text) {
+          var t = (text || "").trim();
+          if (!t) return null;
+          var m = t.match(/[?&]list=([A-Za-z0-9_-]+)/);
+          if (m) return { type: "playlist", id: m[1] };
+          m = t.match(/[?&]v=([A-Za-z0-9_-]{6,})/) || t.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/) || t.match(/embed\/([A-Za-z0-9_-]{6,})/);
+          if (m) return { type: "video", id: m[1] };
+          /* אולי הודבק מזהה בלבד, בלי קישור מלא */
+          if (/^[A-Za-z0-9_-]{6,}$/.test(t)) return { type: "video", id: t };
+          return null;
+        }
+
+        function applyUrl() {
+          var parsed = parseYouTubeUrl(urlInput.value);
+          if (!parsed) {
+            controlsMsg.textContent = "לא זוהה קישור יוטיוב תקין. הדביקו קישור של סרטון או של רשימת השמעה.";
+            return;
+          }
+          if (parsed.type === "playlist") {
+            current.playlistId = parsed.id;
+            current.mode = "playlist";
+            applyPlayer("הרשימה הוחלפה מהקישור שהודבק.");
+          } else {
+            current.videoId = parsed.id;
+            current.mode = "video";
+            applyPlayer("הסרטון הוחלף מהקישור שהודבק.");
+          }
+        }
+        btnApplyUrl.addEventListener("click", applyUrl);
+        urlInput.addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter") { ev.preventDefault(); applyUrl(); }
+        });
+
+        /* טעינת הנגן הראשונה לפי ההגדרות */
+        applyPlayer("");
+
+        /* ============================================================
+           השעון, התאריכים ופרשת השבוע
+           ============================================================ */
+        var timeFmt = new Intl.DateTimeFormat("en-GB", {
+          timeZone: TZ, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        });
+        var partsFmt = new Intl.DateTimeFormat("en-US", {
+          timeZone: TZ, year: "numeric", month: "numeric", day: "numeric"
+        });
+        var weekdayFmt = new Intl.DateTimeFormat("he-IL", { timeZone: TZ, weekday: "long" });
+        var hebrewFmt = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
+          day: "numeric", month: "long", year: "numeric"
+        });
+        var gregFmt = new Intl.DateTimeFormat("he-IL", {
+          day: "numeric", month: "long", year: "numeric"
+        });
+
+        function pad(n) { return (n < 10 ? "0" : "") + n; }
+        function isoKey(d) {
+          return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+        }
+
+        /* התאריך של היום כפי שהוא בישראל, כאובייקט Date פשוט */
+        function todayInIsrael(now) {
+          var p = partsFmt.formatToParts(now), y, m, d;
+          for (var i = 0; i < p.length; i++) {
+            if (p[i].type === "year") y = +p[i].value;
+            else if (p[i].type === "month") m = +p[i].value;
+            else if (p[i].type === "day") d = +p[i].value;
+          }
+          return new Date(y, m - 1, d);
+        }
+
+        /* מציאת הפרשה: קופצים לשבת הקרובה ובודקים בטבלה.
+           שבתות של חגים (בלי פרשה רגילה) מדולגות לשבוע הבא. */
+        function updateParasha(today) {
+          var d = new Date(today.getTime());
+          var add = (6 - d.getDay() + 7) % 7; /* ימים עד שבת (0 אם היום שבת) */
+          d.setDate(d.getDate() + add);
+          var name = null, shabbat = null;
+          for (var w = 0; w < 5; w++) {
+            var key = isoKey(d);
+            if (SEDROT[key]) { name = SEDROT[key]; shabbat = d; break; }
+            d = new Date(d.getTime());
+            d.setDate(d.getDate() + 7);
+          }
+          if (name) {
+            parashaNameEl.textContent = "פרשת " + name;
+            parashaDateEl.textContent =
+              "שבת · " + gregFmt.format(shabbat) + " · " + hebrewFmt.format(shabbat);
+          } else {
+            parashaNameEl.textContent = "פרשת השבוע";
+            parashaDateEl.textContent = "";
+          }
+        }
+
+        /* רענון כל שנייה: השעון תמיד, והתאריך/פרשה רק כשהיום מתחלף */
+        var lastDayKey = "";
+        function tick() {
+          var now = new Date();
+          clockEl.textContent = timeFmt.format(now);
+          var today = todayInIsrael(now);
+          var key = isoKey(today);
+          if (key !== lastDayKey) {
+            lastDayKey = key;
+            hebrewEl.textContent = hebrewFmt.format(today);
+            gregEl.textContent = weekdayFmt.format(now) + " · " + gregFmt.format(today);
+            updateParasha(today);
+          }
+        }
+
+        tick();
+        setInterval(tick, 1000);
+      })();
+    </script>
+  </body>
+</html>
